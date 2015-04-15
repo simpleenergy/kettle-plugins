@@ -1,10 +1,13 @@
 package com.simpleenergy.pentaho.scriptinput
 
-import org.pentaho.di.core.Counter
+import java.util.{ List => JList, Map => JMap }
+
+import org.pentaho.di.core.{ CheckResultInterface, Counter }
 import org.pentaho.di.core.database.DatabaseMeta
 import org.pentaho.di.core.exception.KettleStepException
 import org.pentaho.di.core.row._
 import org.pentaho.di.core.variables.VariableSpace
+import org.pentaho.di.repository.{ ObjectId, Repository }
 import org.pentaho.di.trans._
 import org.pentaho.di.trans.step._
 
@@ -57,6 +60,10 @@ class ScriptInputStepMeta extends BaseStepMeta with StepMetaInterface {
 
   def setDefault(): Unit = { command = ""; outputField = "output_line" }
 
+  override def check(remarks: JList[CheckResultInterface], meta: TransMeta, stepMeta: StepMeta, prev: RowMetaInterface, input: Array[String], output: Array[String], info: RowMetaInterface) = {
+    // TODO: Implement a check
+  }
+
   override def getFields(inputRowMeta: RowMetaInterface, name: String, info: Array[RowMetaInterface], nextStep: StepMeta, space: VariableSpace): Unit = {
     val v = valueMeta()
     v.setOrigin(name)
@@ -66,10 +73,7 @@ class ScriptInputStepMeta extends BaseStepMeta with StepMetaInterface {
   override def getXML() =
     s"<settings><command>${command}</command><outputField>${outputField}</outputField></settings>"
 
-  override def loadXML(node: org.w3c.dom.Node, databases: java.util.List[DatabaseMeta], meta: org.pentaho.metastore.api.IMetaStore): Unit = loadXML(node, databases)
-  override def loadXML(node: org.w3c.dom.Node, databases: java.util.List[DatabaseMeta], counters: java.util.Map[String, Counter]): Unit = loadXML(node, databases)
-
-  override def loadXML(node: org.w3c.dom.Node, databases: java.util.List[DatabaseMeta]) = {
+  override def loadXML(node: org.w3c.dom.Node, databases: java.util.List[DatabaseMeta], counters: java.util.Map[String, Counter]): Unit = {
     println(s"Loading XML from $node")
     import javax.xml.xpath._
     val xpath = XPathFactory.newInstance.newXPath
@@ -78,6 +82,14 @@ class ScriptInputStepMeta extends BaseStepMeta with StepMetaInterface {
     outputField = xpath.evaluate("//settings/outputField", node)
 
     println(s"Loaded params: command = $command, outputField = $outputField")
+  }
+
+  override def readRep(rep: Repository, stepId: ObjectId, databases: JList[DatabaseMeta], counters: JMap[String, Counter]): Unit = {
+    throw new UnsupportedOperationException("readRep")
+  }
+
+  override def saveRep(rep: Repository, transformId: ObjectId, stepId: ObjectId): Unit = {
+    throw new UnsupportedOperationException("readRep")
   }
 }
 
